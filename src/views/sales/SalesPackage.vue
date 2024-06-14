@@ -1,28 +1,18 @@
 <template>
-
-  <div>
+  <PackageProvider>
     <component :is="currentComponent"></component>
-  </div>
+  </PackageProvider>
 </template>
 
-<script>
+<script setup>
+import { ref, markRaw } from 'vue';
 import PackageDashboard from '@/components/sales/package/PackageDashboard.vue';
+import PackageProvider from '@/components/sales/package/PackageProvider.vue';
 
-export default {
-  name: 'SalesPackage',
-  components: {
-    PackageDashboard,
-  },
-  data() {
-    return {
-      currentComponent: PackageDashboard,
-    };
-  },
-  methods: {
-    showPackageDashboard() {
-      this.currentComponent = PackageDashboard;
-    },
-  },
+const currentComponent = ref(markRaw(PackageDashboard));
+const currentProvider = ref(markRaw(PackageProvider));
+
+const showPackageDashboard = () => {
+  currentComponent.value = PackageDashboard;
 };
 </script>
-

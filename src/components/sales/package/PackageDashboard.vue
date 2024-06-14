@@ -3,12 +3,11 @@
     <div class="package-container">
       <div class="package-box">
         <div class="package-item">
-          <button class="btn-create" @click="openModalForCreate">
+          <button class="btn-create" @click="openModalForCreate()">
             <p>신규등록</p>
           </button>
         </div>
       </div>
-
       <table>
         <thead>
           <tr>
@@ -24,154 +23,86 @@
         <tbody>
           <tr
             v-for="pkg in packages"
-            :key="pkg.package_code"
-            @click="openModal(pkg.package_code)">
-            <td>{{ pkg.package_name }}</td>
+            :key="pkg.packageCode"
+            @click="openModal(pkg.packageCode)">
+            <td>{{ pkg.packageName }}</td>
             <td>{{ pkg.country }}</td>
-            <td>{{ pkg.start_date }}</td>
-            <td>{{ pkg.end_date }}</td>
-            <td>{{ pkg.sale_start_date }}</td>
-            <td>{{ pkg.sale_end_date }}</td>
-            <td>{{ pkg.assign_code }}</td>
+            <td>{{ pkg.startDate }}</td>
+            <td>{{ pkg.endDate }}</td>
+            <td>{{ pkg.saleStartDate }}</td>
+            <td>{{ pkg.saleEndDate }}</td>
+            <td>{{ pkg.assignCode }}</td>
           </tr>
         </tbody>
       </table>
       <Pagination />
     </div>
-
-    <PackageModal v-if="isModalOpen" @close="closeModal">
+    <PackageModal v-if="packageState.isModalOpen" @close="closeModal()">
       <PackageDetail />
     </PackageModal>
   </div>
 </template>
 
-<script>
-import { ref, onMounted, provide } from 'vue';
-import {
-  getPackageList,
-  getPackage,
-  getCountries,
-  getPackageCnt,
-} from '@/api/sales/PackageApi';
+<script setup>
+import { inject, onMounted } from 'vue';
+import { getPackage, getCountries } from '@/api/sales/PackageApi';
 import PackageDetail from '@/components/sales/package/PackageDetail.vue';
 import PackageModal from '@/components/sales/package/PackageModal.vue';
 import Pagination from '@/components/sales/package/Pagination.vue';
 
-export default {
-  name: 'PackageDashboard',
-  components: {
-    PackageDetail,
-    PackageModal,
-    Pagination,
-  },
-  setup() {
-    const packages = ref([]);
-    const isModalOpen = ref(false);
-    const packageCode = ref('');
-    const empId = sessionStorage.getItem('empId') || 'EMP30002';
-    const isEditing = ref(false);
-    const packageDetail = ref({});
-    const countries = ref([]);
-    const packageCnt = ref(0);
+const packages = inject('packages');
+const packageState = inject('packageState');
+const partnerState = inject('partnerState')
+const resetPackageState = inject('resetPackageState');
+const resetPartnerState = inject('resetPartnerState')
+const fetchPackages = inject('fetchPackages');
+const empId = inject('empId');
 
-    const currentPage = ref(1);
-    const itemsPerPage = 5;
-    const totalPages = ref(0);
 
-    const fetchPackages = async () => {
-      try {
-        const params = {
-          empId,
-          limit: itemsPerPage,
-          offset: itemsPerPage * (currentPage.value - 1),
-        };
-        const [data, cnt] = await Promise.all([
-          getPackageList(params),
-          getPackageCnt({ empId }), 
-        ]);
-        packages.value = data;
-        packageCnt.value = cnt;
-        totalPages.value = Math.ceil(cnt / itemsPerPage);
-        console.log(Math.ceil(cnt / itemsPerPage))
-      } catch (error) {
-        console.error('Failed to fetch packages:', error);
-      }
-    };
+onMounted(() => {
+  fetchPackages()
+  
+});
 
-    onMounted(fetchPackages);
+const openModal = async (pkgCode = '') => {
+  packageState.packageCode = pkgCode;
+ 
+  try {
+    if (pkgCode) {
+      const data = await getPackage({
+        packageCode: pkgCode,
+        empId: empId,
+      });
+      packageState.packageDetail = data;
+      if (packageState.packageDetail)
+      partnerState.selectedCountryCode = packageState.packageDetail.countryCode
+      // console.log(packageState.packageDetail)
+      // console.log(partnerState.selectedCountryCode)
+    } else {
+      packageState.packageDetail = {};
+    }
 
-    const openModal = async (pkgCode = '') => {
-      packageCode.value = pkgCode;
-      isModalOpen.value = false;
+    if (packageState.packageDetail && partnerState.selectedCountryCode !== undefined) {
+      packageState.isModalOpen = true;
+    }
+  } catch (error) {
+    console.error('Failed to load package details:', error);
+  }
+};
 
-      try {
-        if (pkgCode) {
-          const data = await getPackage({
-            packageCode: pkgCode,
-            empId: empId,
-          });
-          packageDetail.value = data;
-        } else {
-          packageDetail.value = {};
-        }
+const openModalForCreate = async () => {
+  resetPackageState();
+  packageState.isEditing = true;
+  const countryData = await getCountries();
+  packageState.countries = countryData;
+  if (packageState.countries.length > 0 && packageState.isEditing) {
+    packageState.isModalOpen = true;
+  }
+};
 
-        if (packageDetail.value) {
-          setTimeout(() => {
-            isModalOpen.value = true;
-          }, 0);
-        }
-      } catch (error) {
-        console.error('Failed to load package details:', error);
-      }
-    };
-
-    const openModalForCreate = async () => {
-      isModalOpen.value = true;
-      packageCode.value = '';
-      isEditing.value = true;
-      packageDetail.value = {};
-      const countryData = await getCountries();
-      countries.value = countryData;
-    };
-
-    const closeModal = () => {
-      isModalOpen.value = false;
-      isEditing.value = false;
-      packageDetail.value = {};
-      packageCode.value = '';
-    };
-
-    const setCurrentPage = (page) => {
-      currentPage.value = page;
-      fetchPackages();
-    };
-
-    provide('empId', empId);
-    provide('packageCode', packageCode);
-    provide('isEditing', isEditing);
-    provide('packageDetail', packageDetail);
-    provide('countries', countries);
-    provide('packageCnt', packageCnt);
-    provide('currentPage', currentPage);
-    provide('totalPages', totalPages);
-    provide('setCurrentPage', setCurrentPage);
-
-    return {
-      packages,
-      isModalOpen,
-      openModal,
-      openModalForCreate,
-      closeModal,
-      packageCode,
-      empId,
-      isEditing,
-      packageDetail,
-      countries,
-      currentPage,
-      totalPages,
-      setCurrentPage,
-    };
-  },
+const closeModal = () => {
+  resetPackageState()
+  resetPartnerState()
 };
 </script>
 

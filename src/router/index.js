@@ -11,6 +11,7 @@ import SalesPartner from "../views/sales/SalesPartner.vue";
 import SalesPackage from "../views/sales/SalesPackage.vue";
 import SalaryData from "@/views/salary/SalaryData.vue";
 import SalaryPayment from "@/views/salary/SalaryPayment.vue";
+import MyPage from "@/views/mypage/MyPage.vue";
 
 const routes = [
   {
@@ -81,6 +82,37 @@ const routes = [
     path: "/salary/payment",
     name: "SalaryPayment",
     component: SalaryPayment,
+  },
+  {
+    path: "/mypage",
+    name: "MyPage",
+    component: MyPage,
+  },
+  {
+    path: '/attendance',
+    name: 'AttendanceMain',
+    component: () => import('../views/attendances/AttendanceMain.vue'),
+    // meta: { requiresAuth: true }
+    children: [
+      {
+        path: 'myAttendance',
+        name: 'MyAttendance',
+        component: () => import('../views/attendances/MyAttendance.vue'),
+        // meta: { requiresAuth: true }
+      },
+      {
+        path: 'teamAttendance',
+        name: 'TeamAttendance',
+        component: () => import('../views/attendances/TeamAttendance.vue'),
+        // meta: { requiresAuth: true }
+      },
+      {
+        path: 'adminAttendance',
+        name: 'AdminAttendance',
+        component: () => import('../views/attendances/AdminAttendance.vue'),
+        // meta: { requiresAuth: true }
+      }
+    ]
   },
 ];
 

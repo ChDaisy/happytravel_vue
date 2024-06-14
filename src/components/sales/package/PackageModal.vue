@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-overlay" @keydown.esc="handleClose">
+  <div class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-header-item">
@@ -15,18 +15,18 @@
         <button
           type="button"
           class="btn-update"
-          v-if="!isEditing"
-          @click="toggleEditing">
+          v-if="!packageState.isEditing"
+          @click="toggleEditing()">
           수정하기
         </button>
         <button
           type="submit"
           class="btn-update"
-          v-if="isEditing"
-          @click="handleSave">
+          v-if="packageState.isEditing"
+          @click="handleSave()">
           저장
         </button>
-        <button type="button" class="btn-close" @click="handleClose">
+        <button type="button" class="btn-close" @click="handleClose()">
           닫기
         </button>
       </div>
@@ -34,53 +34,62 @@
   </div>
 </template>
 
-<script>
-import { inject } from 'vue';
+<script setup>
+import { inject, onMounted, onUnmounted } from 'vue'
+import { getCountries } from '@/api/sales/PackageApi'
 
-export default {
-  name: 'PackageModal',
-  props: {
-    title: {
-      type: String,
-      default: '여행상품 상세',
-    },
-    headerIcon: {
-      type: String,
-      default: '@/assets/icons/flight.png',
-    },
+
+const props = defineProps({
+  title: {
+    type: String,
+    default: '여행상품 상세',
   },
-  emits: ['close', 'update:isEditing'],
-  setup(_, { emit }) {
-    const isEditing = inject('isEditing');
+})
 
-    const handleClose = () => {
-      isEditing.value = false;
-      emit('close');
-    };
+const packageState = inject('packageState')
+const resetPackageState = inject('resetPackageState')
+const resetPartnerState = inject('resetPartnerState')
+const submitForm = inject('submitForm')  
+const CRUDStateEnum = inject('CRUDStateEnum')
 
-    const toggleEditing = () => {
-      isEditing.value = !isEditing.value;
-    };
+const toggleEditing = async () => {
+  const countryData = await getCountries()
+  packageState.crudState = CRUDStateEnum.UPDATE
+  packageState.countries = countryData
+  if (packageState.countries) packageState.isEditing = true
+}
 
-    const handleSave = () => {
-      emit('update:isEditing', false);
-    };
+const handleSave = async () => {
+  await submitForm()
+}
 
-    return {
-      isEditing,
-      handleClose,
-      toggleEditing,
-      handleSave,
-    };
-  },
-};
+const handleClose = () => {
+  resetPackageState()
+  resetPartnerState()
+}
+
+const handleKeyDown = (event) => {
+  if (event.key === 'Escape') {
+    resetPackageState()
+    resetPartnerState()
+    handleClose()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeyDown)
+})
 </script>
-
 
 <style scoped lang="scss">
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -92,6 +101,7 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
 .modal-content {
   display: flex;
   flex-direction: column;
@@ -102,50 +112,48 @@ export default {
   border: 0px;
   height: 800px;
   min-width: 500px;
-  width:  50%;
+  width: 50%;
   overflow-y: auto;
 }
 
 .modal-header {
-  display:flex;
-  
+  display: flex;
   align-items: center;
-  
   width: 100%;
   height: 100px;
   @apply bg-blue-700;
   h1 {
     font-size: 3rem;
-    color:white;
+    color: white;
     text-align: center;
     vertical-align: middle;
   }
 }
+
 .modal-header-item {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  
-  width:10%;
-  height:100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 10%;
+  height: 100%;
   border-radius: 4px 0px 0px 0px;
   img {
-    object-fit:contain;
+    object-fit: contain;
     height: 70%;
     width: auto;
   }
 }
+
 .button-container {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  width:100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   height: 100px;
 }
 
 .btn-create {
   @apply bg-blue-700 text-white font-bold rounded;
-
   transition: background-color 0.3s ease;
   width: 100px;
   height: 40px;
@@ -156,7 +164,6 @@ export default {
 
 .btn-update {
   @apply bg-orange-400 text-white font-bold rounded;
-
   transition: background-color 0.3s ease;
   width: 100px;
   height: 40px;
@@ -167,7 +174,6 @@ export default {
 
 .btn-delete {
   @apply bg-red-600 text-white font-bold rounded;
-
   transition: background-color 0.3s ease;
   width: 100px;
   height: 40px;
@@ -178,7 +184,6 @@ export default {
 
 .btn-close {
   @apply bg-gray-400 text-white font-bold rounded;
-
   transition: background-color 0.3s ease;
   width: 100px;
   height: 40px;
