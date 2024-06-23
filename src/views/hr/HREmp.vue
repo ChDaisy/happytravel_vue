@@ -19,6 +19,7 @@
         type="text"
         class="w-1/2 h-10 pl-1 border border-gray-200 outline-none ml-[2px]"
         placeholder="검색어 입력"
+        autocomplete="off"
       />
       <button
         id="newEmpBtn"
@@ -132,7 +133,6 @@ export default {
         imgSrc.value = `data:image/jpeg;base64,${empInfo.imageData}`;
         onEmpForm.value = true;
         console.log(sessionStorage.getItem("loginInfo"));
-
       } catch (error) {
         console.error("Error fetching emp info: ", error);
       }

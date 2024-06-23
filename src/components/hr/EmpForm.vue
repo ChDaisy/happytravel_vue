@@ -35,6 +35,7 @@
           :readonly="isReadOnly"
           :disabled="isDisabled"
           class="flex w-2/6 h-8 px-1 border border-slate-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -49,6 +50,7 @@
           v-model="thisEmployee.password"
           :disabled="isDisabled"
           class="flex w-2/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -64,6 +66,7 @@
           :readonly="isReadOnly"
           :disabled="isDisabled"
           class="flex w-2/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -79,6 +82,7 @@
           :readonly="isReadOnly"
           :disabled="isDisabled"
           class="flex w-2/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -96,6 +100,7 @@
           @input="validateSSNFirst"
           maxlength="6"
           class="flex w-1/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
         <span class="text-base">-</span>
         <input
@@ -107,6 +112,7 @@
           @input="validateSSNLast"
           maxlength="7"
           class="flex w-1/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -123,6 +129,7 @@
           readonly
           :disabled="isDisabled"
           class="flex w-2/12 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
         <input
           type="text"
@@ -130,6 +137,7 @@
           v-model="thisEmployee.address"
           :disabled="isDisabled"
           class="flex w-7/12 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
         <button
           @click="searchAddress"
@@ -170,6 +178,7 @@
           v-model="thisEmployee.address_detail"
           :disabled="isDisabled"
           class="flex w-10/12 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -196,6 +205,7 @@
           @input="validatePhoneSecond"
           maxlength="4"
           class="flex w-1/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
         <input
           type="text"
@@ -205,6 +215,7 @@
           @input="validatePhoneThird"
           maxlength="4"
           class="flex w-1/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -231,6 +242,7 @@
           @input="validateMobileSecond"
           class="flex w-1/6 h-8 px-1 border border-gray-200 outline-none"
           maxlength="4"
+          autocomplete="off"
         />
         <input
           type="text"
@@ -240,6 +252,7 @@
           @input="validateMobileThird"
           class="flex w-1/6 h-8 px-1 border border-gray-200 outline-none"
           maxlength="4"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -317,6 +330,7 @@
           :readonly="isResignedOrOnLeave"
           :disabled="isDisabled"
           class="flex w-2/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -348,6 +362,7 @@
           v-model="thisEmployee.account_no"
           :disabled="isDisabled"
           class="flex w-7/12 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
       </div>
       <div class="flex my-1 gap-1">
@@ -362,6 +377,7 @@
           v-model="thisEmployee.salary"
           :disabled="isDisabled"
           class="flex w-2/6 h-8 px-1 border border-gray-200 outline-none"
+          autocomplete="off"
         />
         <label
           for="salary"
